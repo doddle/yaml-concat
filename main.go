@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	// pflag because --flag is more "normal" than -flag
@@ -36,6 +37,10 @@ func main() {
 	}
 
 	matches, err := findYaml(*path, *excluded, *hidden)
+
+	// sort them
+	sort.Strings(matches)
+
 	if err != nil {
 		fmt.Printf("# error?\n")
 		os.Exit(101)
