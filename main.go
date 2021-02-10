@@ -73,12 +73,12 @@ func formatStream(r io.Reader, out io.Writer, indent int) error {
 	in := yaml.Node{}
 	err := d.Decode(&in)
 	for err == nil {
-		e := yaml.NewEncoder(out)
-		e.SetIndent(indent)
-		if err := e.Encode(&in); err != nil {
+		enc := yaml.NewEncoder(out)
+		enc.SetIndent(indent)
+		if err := enc.Encode(sortYAML(&in)); err != nil {
 			log.Fatal(err)
 		}
-		e.Close()
+		enc.Close()
 
 		if err = d.Decode(&in); err == nil {
 			fmt.Fprintln(out, "---")

@@ -23,6 +23,7 @@ Notes:
 
 - some code was taken from: https://github.com/wangkuiyi/yamlfmt
 - a modified go-yaml.v3 is used to keep sequence indentation to a minimum (https://github.com/go-yaml/yaml/issues/661 + https://github.com/starkers/yaml/commit/63f3856906e9106804ce495f3077d99340cdf9d9)
+- sort.go from [github.com/stuart-warren/yamlfmt](https://github.com/stuart-warren/yamlfmt/blob/70574c5e3a93c38503461ea2fa1c3b3345948c1c/sorter.go)
 
 
 # Reasoning:
