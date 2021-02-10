@@ -1,3 +1,4 @@
+# example1[0] comment
 apiVersion: acme/v1
 kind: Deployment
 spec:
@@ -15,5 +16,6 @@ spec:
         - name: SOME_VAR
           value: '00123123'
 ---
+# example1[1] comment
 anotherDoc: true
 handled: "just fine"

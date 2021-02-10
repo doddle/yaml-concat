@@ -2,27 +2,48 @@ package main
 
 import (
 	"bytes"
-	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
+
+	// pflag because --flag is more "normal" than -flag
+
+	flag "github.com/spf13/pflag"
 
 	"gopkg.in/yaml.v3"
 )
 
 func main() {
-	overwrite := flag.Bool("w", false, "overwrite the input file")
-	indent := flag.Int("indent", 2, "default indent")
+
+	// arguments/flags
+	path := flag.String("path", "", "relative or absolute path to read files from")
+	indent := flag.Int("indent", 2, "output yaml indentation level")
+	hidden := flag.Bool("hidden", false, "including looking for hidden files")
+	excluded := flag.String("exclude", "", "files to exclude")
 	flag.Parse()
 
-	if flag.NArg() > 0 {
-		for _, f := range flag.Args() {
-			formatFile(f, *indent, *overwrite)
-		}
-	} else {
-		formatStream(os.Stdin, os.Stdout, *indent)
+	// show a human friendly message if --path isn't specified
+
+	if !isFlagPassed("path") {
+		fmt.Println("# error, --path must be provided")
+		fmt.Printf("\nUsage of yaml-concate:\n")
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+
+	matches, err := findYaml(*path, *excluded, *hidden)
+	if err != nil {
+		fmt.Printf("# error?\n")
+		os.Exit(101)
+	}
+	for _, i := range matches {
+		fmt.Printf("# munching yaml from %s\n", i)
+		fmt.Println("---")
+		formatFile(i, *indent, false)
 	}
 }
 
@@ -31,14 +52,11 @@ func formatFile(f string, indent int, overwrite bool) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	var out bytes.Buffer
 	if e := formatStream(r, &out, indent); e != nil {
 		log.Fatalf("Failed formatting YAML stream: %v", e)
 	}
-
 	r.Close()
-
 	if e := dumpStream(&out, f, overwrite); e != nil {
 		log.Fatalf("Cannot overwrite: %v", e)
 	}
@@ -73,4 +91,72 @@ func dumpStream(out *bytes.Buffer, f string, overwrite bool) error {
 	}
 	_, err := io.Copy(os.Stdout, out)
 	return err
+}
+
+func isHidden(path string) bool {
+	// get just the filename without base path
+	file := filepath.Base(path)
+	// return true if its first character is a fullstop
+	return strings.HasPrefix(file, ".")
+}
+
+func findYaml(root, excluded string, includeHidden bool) ([]string, error) {
+
+	fmt.Printf("# searching path: %s\n", root)
+
+	// acceptable yaml extension patterns
+	yamlPatterns := []string{
+		"*.yaml",
+		"*.yml",
+	}
+
+	// we'll store a slice of files matching the pattern here
+	var matches []string
+
+	// attempt to walk a folder looking for files that match the extensions
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+
+		// TODO: feels bad :/ please improve me
+		for _, i := range yamlPatterns {
+			matched, err := filepath.Match(i, filepath.Base(path))
+			if err != nil {
+				// TODO: unsure how to replicate this situation, test me and improve the reporting..
+				fmt.Printf("\n # bad error :/\n")
+				os.Exit(100)
+			}
+
+			// the level of if's here is terribad.. please david fix me and write tests :/
+			if matched {
+				if includeHidden {
+					matches = append(matches, path)
+				} else {
+					if !isHidden(path) {
+						matches = append(matches, path)
+					}
+				}
+			}
+		}
+		// finished..
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return matches, nil
+}
+
+func isFlagPassed(name string) bool {
+	found := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == name {
+			found = true
+		}
+	})
+	return found
 }

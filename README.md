@@ -1,8 +1,8 @@
 # Usage
 
 This tool will:
-- walk a `--path` of files looking for `.yaml` and `.yml` files
-- exclude any file names listed using the optional `--exclude` argument
+- walk a `--path` of files looking for `*.yaml` and `*.yml` files
+- on default hidden files (eg `.hidden.yaml` will be ignored (#TODO: allow searching for them also, or a custom exclude list?)
 - for each yaml file found it will stream each individual document to stdout
 
 Notes:
