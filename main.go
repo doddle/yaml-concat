@@ -32,7 +32,7 @@ func main() {
 		fmt.Println("# error, --path must be provided")
 		fmt.Printf("\nUsage of yaml-concate:\n")
 		flag.PrintDefaults()
-		os.Exit(0)
+		os.Exit(102)
 	}
 
 	matches, err := findYaml(*path, *excluded, *hidden)
