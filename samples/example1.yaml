@@ -1,0 +1,21 @@
+# example1[0] comment
+apiVersion: acme/v1
+kind: Deployment
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      # much myimage, so wow
+      - image: myimage:foo-bar
+        name: someapp
+        ports:
+          - containerPort: 8080
+            name: http
+        env:
+        - name: SOME_VAR
+          value: '00123123'
+---
+# example1[1] comment
+anotherDoc: true
+handled: "just fine"

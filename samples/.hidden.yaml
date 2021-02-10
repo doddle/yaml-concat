@@ -1,0 +1,3 @@
+# .hidden.yaml[0] comment
+# This should NOT be included
+badHidden: data
