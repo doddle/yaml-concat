@@ -41,8 +41,9 @@ func main() {
 		os.Exit(101)
 	}
 	for _, i := range matches {
-		fmt.Printf("# munching yaml from %s\n", i)
+		// TODO: check formatFile works BEFORE inserting "---" into the stream, avoiding potential for empty docs
 		fmt.Println("---")
+		fmt.Fprintf(os.Stderr, "# reading : %s\n", i)
 		formatFile(i, *indent, false)
 	}
 }
@@ -102,7 +103,7 @@ func isHidden(path string) bool {
 
 func findYaml(root, excluded string, includeHidden bool) ([]string, error) {
 
-	fmt.Printf("# searching path: %s\n", root)
+	fmt.Fprintf(os.Stderr, "# searching path: %s\n", root)
 
 	// acceptable yaml extension patterns
 	yamlPatterns := []string{

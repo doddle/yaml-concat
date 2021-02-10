@@ -7,12 +7,17 @@ This tool will:
 
 Notes:
 - This handles individual **documents** inside a file (`---` seperated docs in a files) consistently
-- `stderr` is never used, everything is `stdout`
-- comments and quoting are preserved
-- some additional notes about what its doing can be outputted, these are always produced as safe  `# ` comments
+- yaml is produced to `stdout`, all logging/comments/status as this script runs is sent to stderr (although error logging/panicing has not been reviewed yet)
+- comments and quoting are preserved, sometimes this can come out "weird"
 
-`yaml-concat --exclude somefile.yaml --path ./source/files/`
+`yaml-concat --path ./source/files/`
 
+
+# Issues
+1. there are no test! (yet)
+2. Potential for empty `---` documents
+3. about 10 minutes has been spent assessing the logging behaviour, it needs work
+4. no effort has been put into the guarantees around executing this.
 
 # Sources
 
